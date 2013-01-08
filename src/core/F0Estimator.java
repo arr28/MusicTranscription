@@ -164,7 +164,7 @@ public class F0Estimator
         // Calculate the weights.
         final double[][] lWeights = mWeightCalculator.calculateWeights(
                                                                     lWhitened);
-        if (++lCount == 454)
+        if (++lCount == 100)
         {
           mWeightWindow.addWeights(lWeights);
         }
