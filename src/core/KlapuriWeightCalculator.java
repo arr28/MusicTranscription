@@ -150,7 +150,7 @@ public class KlapuriWeightCalculator
       for (int k = k0; k <= k1; k++)
       {
         final int n = Math.round(k / h);
-        lWeights[n] = Math.min(lWeights[n], xiWhitened[k] * xiBand.mWindowCoefficients[k]);
+        lWeights[n] = Math.max(lWeights[n], xiWhitened[k] * xiBand.mWindowCoefficients[k]);
       }
 
       h++;

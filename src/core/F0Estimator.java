@@ -162,10 +162,10 @@ public class F0Estimator
         mSpecWindow.addSamples(lWhitened);
 
         // Calculate the weights.
-        final double[][] lWeights = mWeightCalculator.calculateWeights(
-                                                                    lWhitened);
         if (++lCount == 100)
         {
+          final double[][] lWeights = mWeightCalculator.calculateWeights(
+                                                                    lWhitened);
           mWeightWindow.addWeights(lWeights);
         }
       }
