@@ -15,22 +15,19 @@ import javax.swing.JPanel;
 public class SpectogramWindow
 {
   private static final int BLOCK_WIDTH = 1;
-  private static final int BLOCK_HEIGHT = 2;
+  private static final int BLOCK_HEIGHT = 5;
 
   private final SpectogramCanvas mCanvas = new SpectogramCanvas();
 
   /**
    * Create a spectogram window.
+   *
+   * @param xiTitle - window title.
    */
-  public SpectogramWindow()
-  {
-    createWindow();
-  }
-
-  private void createWindow()
+  public SpectogramWindow(String xiTitle)
   {
     //Create and set up the window.
-    final JFrame lFrame = new JFrame("Spectogram");
+    final JFrame lFrame = new JFrame(xiTitle);
     lFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     // Set the canvas size and add it to the window.

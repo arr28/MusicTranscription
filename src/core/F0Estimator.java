@@ -92,7 +92,8 @@ public class F0Estimator
 
   // UI objects for visualisation
   private final SpectogramWindow mSpecWindow;
-  private final WeightWindow mWeightWindow;
+  private final WeightWindow mBandwiseWeightWindow;
+  private final SpectogramWindow mGlobalWeightWindow;
 
   /**
    * Run the multiple F0 estimator.
@@ -123,8 +124,9 @@ public class F0Estimator
     mWhitener = new Whitener(mAudioDescriptor);
     mWeightCalculator = new KlapuriWeightCalculator(mAudioDescriptor);
 
-    mSpecWindow = new SpectogramWindow();
-    mWeightWindow = new WeightWindow();
+    mSpecWindow = new SpectogramWindow("Spectogram");
+    mBandwiseWeightWindow = new WeightWindow();
+    mGlobalWeightWindow = new SpectogramWindow("Global weights");
   }
 
   /**
@@ -162,12 +164,16 @@ public class F0Estimator
         mSpecWindow.addSamples(lWhitened);
 
         // Calculate the weights.
+        final double[][] lBandwiseWeights =
+                      mWeightCalculator.calculateBandwiseWeights(lWhitened);
         if (++lCount == 100)
         {
-          final double[][] lWeights = mWeightCalculator.calculateWeights(
-                                                                    lWhitened);
-          mWeightWindow.addWeights(lWeights);
+          mBandwiseWeightWindow.addWeights(lBandwiseWeights);
         }
+
+        final double[] lGlobalWeights =
+                  mWeightCalculator.calculateGlobalWeights(lBandwiseWeights);
+        mGlobalWeightWindow.addSamples(lGlobalWeights);
       }
 
       // Close the wavFile

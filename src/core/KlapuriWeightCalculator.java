@@ -2,6 +2,8 @@ package core;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import core.F0Estimator.AudioDescriptor;
 
@@ -68,19 +70,95 @@ public class KlapuriWeightCalculator
   }
 
   /**
-   * Calculate the Klapuri weights for the given whitened spectrum.
+   * Calculate the bandwise Klapuri weights for the given whitened spectrum.
    *
    * @param xiWhitened - whitened spectrum.
    * @return the weights across all bands.
    */
-  public double[][] calculateWeights(double[] xiWhitened)
+  public double[][] calculateBandwiseWeights(double[] xiWhitened)
   {
     final double[][] lBandWeights = new double[mBands.length][];
     for (int lii = 0; lii < mBands.length; lii++)
     {
-      lBandWeights[lii] = calculateWeights(xiWhitened, mBands[lii]);
+      lBandWeights[lii] = calculateBandWeights(xiWhitened, mBands[lii]);
     }
     return lBandWeights;
+  }
+
+  /**
+   * Calculate global weights from bandwise weights.  See
+   * {@link #calculateBandwiseWeights(double[])}.
+   *
+   * @param xiBandwiseWeights - the bandwise weights.
+   * @return the global weights.
+   */
+  public double[] calculateGlobalWeights(double[][] xiBandwiseWeights)
+  {
+    // Iterate over the bands, looking for F0 candidates
+    final Set<Integer> lTopF0Indicies = new TreeSet<Integer>();
+
+    for (final double[] lBandWeights : xiBandwiseWeights)
+    {
+      // In each band, find the top 3 F0 candidates.
+      int lFirstIndex = 0;
+      double lFirstValue = 0;
+      int lSecondIndex = 0;
+      double lSecondValue = 0;
+      int lThirdIndex = 0;
+      double lThirdValue = 0;
+
+      for (int lii = 0; lii < lBandWeights.length; lii++)
+      {
+        // See if this value make it into the top 3 (kept sorted).
+        if (lBandWeights[lii] > lFirstValue)
+        {
+          lThirdIndex = lSecondIndex;
+          lSecondIndex = lFirstIndex;
+          lFirstIndex = lii;
+
+          lThirdValue = lSecondValue;
+          lSecondValue = lFirstValue;
+          lFirstValue = lBandWeights[lii];
+        }
+        else if (lBandWeights[lii] > lSecondValue)
+        {
+          lThirdIndex = lSecondIndex;
+          lSecondIndex = lii;
+
+          lThirdValue = lSecondValue;
+          lSecondValue = lBandWeights[lii];
+        }
+        else if (lBandWeights[lii] > lThirdValue)
+        {
+          lThirdIndex = lii;
+
+          lThirdValue = lBandWeights[lii];
+        }
+      }
+
+      // Add the top 3 frequencies from this band into the overall set
+      lTopF0Indicies.add(lFirstIndex);
+      lTopF0Indicies.add(lSecondIndex);
+      lTopF0Indicies.add(lThirdIndex);
+    }
+
+    // For each of the F0 candidates, sum the square of the bandwise weights,
+    // taking the maximum weight within the permitted inharmonicity.
+    final double[] lGlobalWeights = new double[xiBandwiseWeights[16].length];
+    for (final Integer lFIndex : lTopF0Indicies)
+    {
+      if ((lFIndex <= mDescriptor.mMaxFreqIndex) &&
+          (lFIndex > 5)) // !! ARR We seem very biased towards low frequencies.  Ignore them for now.
+      {
+        // !! ARR For now, don't take inharmonicity into account
+        for (final double[] lBandWeights : xiBandwiseWeights)
+        {
+          lGlobalWeights[lFIndex] += Math.pow(lBandWeights[lFIndex], 2.0);
+        }
+      }
+    }
+
+    return lGlobalWeights;
   }
 
   /**
@@ -90,7 +168,7 @@ public class KlapuriWeightCalculator
    * @param xiWhitened - the whitened spectrum.
    * @param xiBand - the band at which weights should be calculated.
    */
-  private double[] calculateWeights(double[] xiWhitened, Band xiBand)
+  private double[] calculateBandWeights(double[] xiWhitened, Band xiBand)
   {
     final double lWeights[] = new double[Math.max(mDescriptor.mMaxFreqIndex, xiBand.mMaxIndex + 1)];
 
