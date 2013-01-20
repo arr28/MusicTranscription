@@ -52,7 +52,7 @@ public class Whitener
          lFSample <= mDescriptor.mMaxFreqIndex;
          lFSample++)
     {
-      lScalingFactor += Math.pow(Math.abs(xiFreq[lFSample].getReal()), 1.0 / 3.0);
+      lScalingFactor += Math.pow(Math.abs(xiFreq[lFSample].abs()), 1.0 / 3.0);
     }
     lScalingFactor /= (mDescriptor.mMaxFreqIndex + 1) - mDescriptor.mMinFreqIndex;
     lScalingFactor = Math.pow(lScalingFactor, 3);
@@ -61,7 +61,7 @@ public class Whitener
     for (int lFSample = 0; lFSample < xiFreq.length; lFSample++)
     {
       lScaled[lFSample] =
-          Math.log1p(Math.abs(xiFreq[lFSample].getReal()) / lScalingFactor);
+          Math.log1p(Math.abs(xiFreq[lFSample].abs()) / lScalingFactor);
     }
 
     return lScaled;
