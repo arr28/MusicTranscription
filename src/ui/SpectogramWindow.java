@@ -67,10 +67,7 @@ public class SpectogramWindow
       mColData[mCurrentCol++] = Arrays.copyOf(xiSamples, xiSamples.length);
       for (final double lSample : xiSamples)
       {
-        if (lSample > mMaxSeen)
-        {
-          mMaxSeen = lSample;
-        }
+        mMaxSeen = Math.max(lSample, mMaxSeen);
       }
     }
 
@@ -79,6 +76,8 @@ public class SpectogramWindow
     {
       for (int lCol = 0; lCol < mCurrentCol; lCol++)
       {
+        float lMaxValue = 1;
+        int lMaxIndex = 0;
         for (int lRow = 0; lRow < (mColData[lCol].length / 7); lRow++)
         {
           final float lValue = (float)(1.0 - (mColData[lCol][lRow] / mMaxSeen));
@@ -87,7 +86,20 @@ public class SpectogramWindow
                               678 - (lRow * BLOCK_HEIGHT),
                               BLOCK_WIDTH,
                               BLOCK_HEIGHT);
+          if (lValue < lMaxValue)
+          {
+            lMaxValue = lValue;
+            lMaxIndex = lRow;
+          }
         }
+
+        // Highlight the maximum.
+        xiGraphics.setColor(new Color(0, 0, lMaxValue));
+        xiGraphics.fillRect(lCol * BLOCK_WIDTH,
+                            678 - (lMaxIndex * BLOCK_HEIGHT),
+                            BLOCK_WIDTH,
+                            BLOCK_HEIGHT);
+
       }
     }
   }
