@@ -150,11 +150,16 @@ public class KlapuriWeightCalculator
       if ((lFIndex <= mDescriptor.mMaxFreqIndex) &&
           (lFIndex > 5)) // !! ARR We seem very biased towards low frequencies.  Ignore them for now.
       {
-        // !! ARR For now, don't take inharmonicity into account
+        int lIncluded = 0;
         for (final double[] lBandWeights : xiBandwiseWeights)
         {
-          lGlobalWeights[lFIndex] += Math.pow(lBandWeights[lFIndex], 2.0);
+          if (lBandWeights[lFIndex] != 0)
+          {
+            lIncluded++;
+            lGlobalWeights[lFIndex] += Math.pow(lBandWeights[lFIndex], 2.0);
+          }
         }
+        lGlobalWeights[lFIndex] /= lIncluded;
       }
     }
 
