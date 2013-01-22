@@ -28,7 +28,7 @@ public class F0Estimator
      * - Frame size 2048 = 46ms
      * - Frame size 4096 = 92ms
      */
-    public static final int FRAME_SIZE = 2048;
+    public static final int FRAME_SIZE = 4096;
 
     /**
      * The minimum F0 candidate.
@@ -145,11 +145,12 @@ public class F0Estimator
       final double[] lWholeFile = new double[(int)mWaveFile.getNumFrames()];
       mWaveFile.readFrames(lWholeFile, (int)mWaveFile.getNumFrames());
 
-      // Step through the file, looking at overlapping ~50ms slices.
+      // Step through the file, looking at overlapping slices.
       int lCount = 0;
+      final int lStepSize = (int)((mWaveFile.getSampleRate() * 10) / 1000);
       for (int lOffset = 0;
            (lOffset + AudioDescriptor.FRAME_SIZE) < mWaveFile.getNumFrames();
-           lOffset += (AudioDescriptor.FRAME_SIZE / 8))
+           lOffset += lStepSize)
       {
         // Get a slice of the data
         final double[] lBuffer = Arrays.copyOfRange(lWholeFile,

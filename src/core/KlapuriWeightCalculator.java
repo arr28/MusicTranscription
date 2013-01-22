@@ -144,11 +144,11 @@ public class KlapuriWeightCalculator
 
     // For each of the F0 candidates, sum the square of the bandwise weights,
     // taking the maximum weight within the permitted inharmonicity.
-    final double[] lGlobalWeights = new double[xiBandwiseWeights[16].length];
+    final double[] lGlobalWeights = new double[xiBandwiseWeights[xiBandwiseWeights.length - 1].length];
     for (final Integer lFIndex : lTopF0Indicies)
     {
       if ((lFIndex <= mDescriptor.mMaxFreqIndex) &&
-          (lFIndex > 5)) // !! ARR We seem very biased towards low frequencies.  Ignore them for now.
+          (lFIndex > 10)) // !! ARR We seem very biased towards low frequencies.  Ignore them for now.
       {
         int lIncluded = 0;
         for (final double[] lBandWeights : xiBandwiseWeights)
