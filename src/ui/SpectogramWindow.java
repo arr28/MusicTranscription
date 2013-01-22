@@ -81,7 +81,7 @@ public class SpectogramWindow
         for (int lRow = 0; lRow < (mColData[lCol].length / 7); lRow++)
         {
           final float lValue = (float)(1.0 - (mColData[lCol][lRow] / mMaxSeen));
-          xiGraphics.setColor(new Color(lValue, lValue, lValue));
+          xiGraphics.setColor(new Color(1, lValue, lValue));
           xiGraphics.fillRect(lCol * BLOCK_WIDTH,
                               678 - (lRow * BLOCK_HEIGHT),
                               BLOCK_WIDTH,
@@ -93,13 +93,22 @@ public class SpectogramWindow
           }
         }
 
-        // Highlight the maximum.
-        xiGraphics.setColor(new Color(0, 0, lMaxValue));
+        // Highlight the maximum - if it exceeds the threshold.
+        if (lMaxValue < 0.6) // !! ARR Threshold
+        {
+          xiGraphics.setColor(new Color(0, 0, 0));
+          xiGraphics.fillRect(lCol * BLOCK_WIDTH,
+                              678 - (lMaxIndex * BLOCK_HEIGHT),
+                              BLOCK_WIDTH,
+                              BLOCK_HEIGHT);
+        }
+
+        // Show the power in the maximum.
+        xiGraphics.setColor(new Color(lMaxValue, lMaxValue, lMaxValue));
         xiGraphics.fillRect(lCol * BLOCK_WIDTH,
-                            678 - (lMaxIndex * BLOCK_HEIGHT),
+                            678 - (-5 * BLOCK_HEIGHT),
                             BLOCK_WIDTH,
                             BLOCK_HEIGHT);
-
       }
     }
   }
